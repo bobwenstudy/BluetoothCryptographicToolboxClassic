@@ -827,7 +827,7 @@ def classic_E0(K_session, BD_ADDR_C, CL, debug=True):
 
     output_Z = 0
     for index in range(200 + 39):
-        if index > 0:
+        if index >= 39:
             # next round
             Ct_neg_1 = Ct
             Ct = Ct_1
@@ -925,7 +925,6 @@ def classic_E0(K_session, BD_ADDR_C, CL, debug=True):
     if debug: print("LFSR2  <= %s" % (last_LFSR_2.to_bytes(length=4,byteorder='big',signed=False).hex().upper()))
     if debug: print("LFSR3  <= %s" % (last_LFSR_3.to_bytes(length=5,byteorder='big',signed=False).hex().upper()))
     if debug: print("LFSR4  <= %s" % (last_LFSR_4.to_bytes(length=5,byteorder='big',signed=False).hex().upper()))
-    if debug: print("C[t+1] <= %s" % ('{:02b}'.format(Ct_1)))
 
 
     #Generate keystream
@@ -945,8 +944,12 @@ def classic_E0(K_session, BD_ADDR_C, CL, debug=True):
 
     Z = X1 ^ X2 ^ X3 ^ X4 ^ (Ct & 0x01)
     output_keystream = Z
+    yt = X1 + X2 + X3 + X4
+    St_1 = (yt + Ct) // 2
+    Ct_1 = St_1 ^ T1_values[Ct] ^ T2_values[Ct_neg_1]
 
     t = start_pos + 1
+    if debug: print("C[t+1] <= %s" % ('{:02b}'.format(Ct_1)))
     if debug: print("%3d %12s%1s %12s%1s %12s%1s %12s%1s    %2s %2s %2s %2s   %2s  %6s %6s %6s" % 
             (t
             , last_LFSR_1.to_bytes(length=4,byteorder='big',signed=False).hex().upper()
@@ -2529,11 +2532,11 @@ if __name__ == '__main__':
     
     # E0
     # classic_E0_k_session_test()
-    # classic_E0_process_test()
+    classic_E0_process_test()
 
     # classic_E1_test()
     # classic_E21_test()
-    classic_E22_test()
+    # classic_E22_test()
     # classic_E3_test()
     # classic_f1_test()
     # classic_g_test()
